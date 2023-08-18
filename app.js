@@ -1,0 +1,80 @@
+const express = require('express');
+const app = express();
+
+const passport          = require('passport');
+const passportConfig    = require('./passport');
+const session           = require('express-session');
+const flash             = require('connect-flash');
+
+passportConfig();
+
+//세션 설정
+app.use(
+    session({
+       resave: false,
+       saveUninitialized: false,
+       secret: "sessionsecretsessionsecret",
+    }),
+);
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
+// -----------------------------------------
+// app.get('/main', function(req, res) {
+// 	res.send('main 페이지입니다.');
+// });
+
+// app.get('/test', function(req, res) {
+// 	res.send('test 페이지입니다.');
+// });
+// ------------------------------------------
+
+// 라우터로 이동 ------------------------------
+// app.get('/main', function(req, res) {
+// 	res.sendFile(__dirname + '/main.html');
+// });
+
+// app.get('/test', function(req, res) {
+// 	res.sendFile(__dirname + '/test.html');
+// });
+// -------------------------------------------
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use(express.static(__dirname + '/public'));
+
+//passport 초기화
+app.use(passport.initialize()); //req에 passport 설정 추가
+app.use(passport.session());    //req.session에 passport 데이터 추가
+app.use(flash());
+
+//라우트 객체 생성
+const mainRouter    = require('./routes/index');
+const dustRouter    = require('./routes/dust');
+const userRouter    = require('./routes/user');
+const newsRouter    = require('./routes/news');
+const wifiRouter    = require('./routes/wifi');
+const maskRouter    = require('./routes/mask');
+const glassRouter    = require('./routes/glass');
+const sleepRouter    = require('./routes/sleep');
+const tfjsRouter    = require('./routes/tfjs');
+const sttRouter    = require('./routes/stt');
+
+//라우트 설정
+app.use('/', mainRouter);
+app.use('/dust', dustRouter);
+app.use('/user', userRouter);
+app.use('/news', newsRouter);
+app.use('/wifi', wifiRouter);
+app.use('/mask', maskRouter);
+app.use('/glass', glassRouter);
+app.use('/sleep', sleepRouter);
+app.use('/tfjs', tfjsRouter);
+app.use('/stt', sttRouter);
+
+const PORT = 8080;
+app.listen(PORT, function() {
+    console.log('Listening on port: ', PORT);
+});
